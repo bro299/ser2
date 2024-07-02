@@ -1,0 +1,93 @@
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengonversi TikTok ke MP3</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/" id="reload-page">TikTok ke MP3</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Beranda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/kontak">Kontak</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/video">Video</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/musik">Musik</a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link theme-selector" id="toggle-theme">Tema Terang</span>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container form-container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form id="download-form" method="POST" action="/download">
+                    <div class="form-group">
+                        <label for="url">URL Video TikTok</label>
+                        <input type="text" class="form-control" id="url" name="url" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Unduh MP3</button>
+                </form>
+                <div id="video-info" class="text-center">
+                    <img id="thumbnail" class="thumbnail" src="" alt="">
+                    <h5 id="title"></h5>
+                    <a id="download-link" href="" class="btn btn-success" download>Unduh MP3</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#reload-page').on('click', function() {
+                location.reload();
+            });
+
+            $('#toggle-theme').on('click', function() {
+                $('body').toggleClass('dark-mode');
+                if ($('body').hasClass('dark-mode')) {
+                    $(this).text('Tema Terang');
+                } else {
+                    $(this).text('Tema Gelap');
+                }
+            });
+
+            $('#download-form').on('submit', function(e) {
+                e.preventDefault();
+                var url = $('#url').val();
+                
+                $.ajax({
+                    url: '/download',
+                    type: 'POST',
+                    data: { url: url },
+                    success: function(data) {
+                        $('#thumbnail').attr('src', data.thumbnail);
+                        $('#title').text(data.title);
+                        $('#download-link').attr('href', '/downloads/' + data.mp3_file.split('/').pop());
+                        $('#download-link').show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
